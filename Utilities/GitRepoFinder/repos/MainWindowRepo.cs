@@ -1,4 +1,5 @@
 ﻿using Avalonia.Input;
+using GitRepoFinder.IdeDetection;
 using GitRepoFinder.models;
 using nac.Forms;
 using nac.Forms.model;
@@ -142,14 +143,29 @@ public static class MainWindowRepo
     {
         try
         {
-            string commandArguments = repos.StringFormat.OskarFormat(command.Arguments, new
+            string cmdArgs;
+            string cmdStr;
+
+            if (!command.IsAutoDetected)
             {
-                folderpath = repo.Path
-            });
+                cmdStr = command.ExePath;
+                cmdArgs = repos.StringFormat.OskarFormat(command.Arguments, new
+                {
+                    folderpath = repo.Path
+                });
+            }
+            else
+            {
+                var args = new IdeDetectorArguments();
+                args.folderPath = repo.Path;
+
+                cmdStr = command.IdeDetector.GetCommand(args);
+                cmdArgs = command.IdeDetector.GetArguments(args);
+            }
+
+            repos.log.Info($"Running command: EXE[{cmdStr}] Arguments[{cmdArgs}]");
             
-            repos.log.Info($"Running command: EXE[{command.ExePath}] Arguments[{commandArguments}]");
-            
-            System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(command.ExePath, commandArguments));
+            System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(cmdStr, cmdArgs));
         }
         catch (Exception ex)
         {
