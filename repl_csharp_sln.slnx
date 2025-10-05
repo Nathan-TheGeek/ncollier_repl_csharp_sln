@@ -84,6 +84,8 @@
   <Folder Name="/Utilities/">
     <Project Path="Utilities/GitRepoFinder/GitRepoFinder.csproj" />
     <Project Path="Utilities/NugetPackageSearch/NugetPackageSearch.csproj" />
+    <Project Path="Utilities/GitRepoFinderPluginInterface/GitRepoFinderPluginInterface.csproj" />
+    <Project Path="Utilities/GitRepoFinderTestPlugin/GitRepoFinderTestPlugin.csproj" />
   </Folder>
   <Folder Name="/Utilities/Folder_Comparison/">
     <Project Path="Utilities/Folder_Comparison/Filename without Ext compare/Filename without Ext compare.csproj" />

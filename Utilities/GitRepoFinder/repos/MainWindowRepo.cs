@@ -1,5 +1,5 @@
 ﻿using Avalonia.Input;
-using GitRepoFinder.IdeDetection;
+using GitRepoFinder.Plugin.Interface.IdeDetection;
 using GitRepoFinder.models;
 using nac.Forms;
 using nac.Forms.model;
@@ -11,9 +11,12 @@ public static class MainWindowRepo
     private static nac.Forms.Form myForm;
     private static models.MainWindowModel model;
 
+    private static PluginRepo pluginRepo;
 
     public static async Task run()
     {
+        pluginRepo = PluginRepo.GetSingleInstance();
+
         myForm = nac.Forms.Form.NewForm();
 
         model = new models.MainWindowModel();

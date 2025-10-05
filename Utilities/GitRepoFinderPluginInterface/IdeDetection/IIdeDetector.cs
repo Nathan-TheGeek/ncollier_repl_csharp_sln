@@ -1,6 +1,6 @@
 using System.Dynamic;
 
-namespace GitRepoFinder.IdeDetection;
+namespace GitRepoFinder.Plugin.Interface.IdeDetection;
 
 public interface IIdeDetector
 {

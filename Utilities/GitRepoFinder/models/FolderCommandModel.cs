@@ -1,4 +1,4 @@
-using GitRepoFinder.IdeDetection;
+using GitRepoFinder.Plugin.Interface.IdeDetection;
 
 namespace GitRepoFinder.models;
 

@@ -1,7 +1,7 @@
 namespace GitRepoFinder.IdeDetection;
 
-using System.Runtime.InteropServices;
 using GitRepoFinder.Platform;
+using GitRepoFinder.Plugin.Interface.IdeDetection;
 
 public class VsCodeDetection : IIdeDetector
 {

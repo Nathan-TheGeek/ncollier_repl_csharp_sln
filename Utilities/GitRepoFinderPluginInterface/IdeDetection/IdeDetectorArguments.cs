@@ -1,4 +1,4 @@
-namespace GitRepoFinder.IdeDetection;
+namespace GitRepoFinder.Plugin.Interface.IdeDetection;
 
 public class IdeDetectorArguments
 {

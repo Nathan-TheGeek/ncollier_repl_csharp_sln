@@ -1,6 +1,7 @@
 using System.Reflection;
-using GitRepoFinder.IdeDetection;
+using GitRepoFinder.Plugin.Interface.IdeDetection;
 using GitRepoFinder.models;
+using System.Reflection.Emit;
 
 namespace GitRepoFinder.repos;
 
@@ -65,10 +66,23 @@ public static class CommandsRepo
     private static void RefreshCachedIdeDetectors()
     {
         cachedIdeDetecors = new List<IIdeDetector>();
-        var pluginTypes = Assembly.GetExecutingAssembly().GetTypes()
-            .Where(t => t.IsClass &&
-                        !t.IsAbstract &&
-                        typeof(IdeDetection.IIdeDetector).IsAssignableFrom(t));
+
+        var pluginRepo = PluginRepo.GetSingleInstance();
+        var assemblies = new List<Assembly>() { Assembly.GetExecutingAssembly() };
+        assemblies.AddRange(pluginRepo.GetAssembilies());
+
+        var pluginTypes = new List<Type>();
+        
+        foreach (var assembly in assemblies)
+        {
+            pluginTypes.AddRange(
+                assembly
+                    .GetTypes()
+                    .Where(t => t.IsClass &&
+                                !t.IsAbstract &&
+                                typeof(IIdeDetector).IsAssignableFrom(t))
+            );
+        }
 
         foreach (var plugin in pluginTypes)
         {
