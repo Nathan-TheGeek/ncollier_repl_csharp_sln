@@ -33,6 +33,10 @@ public class PluginRepo
                 }
             }
         }
+        else
+        {
+            Directory.CreateDirectory(pluginPath);
+        }
     }
 
     public Assembly[] GetAssembilies()

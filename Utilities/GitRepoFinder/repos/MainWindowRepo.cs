@@ -3,6 +3,8 @@ using GitRepoFinder.Plugin.Interface.IdeDetection;
 using GitRepoFinder.models;
 using nac.Forms;
 using nac.Forms.model;
+using GitRepoFinder.Platform;
+using System.IO.Pipelines;
 
 namespace GitRepoFinder.repos;
 
@@ -12,6 +14,8 @@ public static class MainWindowRepo
     private static models.MainWindowModel model;
 
     private static PluginRepo pluginRepo;
+
+    private static ShellExecutor shellExecutor = ShellExecutor.getSingleInstance();
 
     public static async Task run()
     {
@@ -167,8 +171,13 @@ public static class MainWindowRepo
             }
 
             repos.log.Info($"Running command: EXE[{cmdStr}] Arguments[{cmdArgs}]");
-            
-            System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(cmdStr, cmdArgs));
+
+            ShellExecutorResult result = shellExecutor.ExecuteCommand(cmdStr + " " + cmdArgs);
+
+            if (result.ExitCode > 0)
+            {
+                throw new Exception($"An error occured attempting to run command EXE[{cmdStr}] Arguments[{cmdArgs}]. " + result.StandardError);
+            }
         }
         catch (Exception ex)
         {

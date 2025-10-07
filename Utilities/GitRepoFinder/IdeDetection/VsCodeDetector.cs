@@ -1,10 +1,24 @@
 namespace GitRepoFinder.IdeDetection;
 
+using System.Security.Cryptography;
 using GitRepoFinder.Platform;
 using GitRepoFinder.Plugin.Interface.IdeDetection;
 
 public class VsCodeDetection : IIdeDetector
 {
+    private bool onPath;
+    private static readonly string[] WINDOWS_CODE_PATHS = {
+        "%AppData%\\..\\Local\\Programs\\Microsoft VS Code\\code.exe",
+        "C:\\Program Files\\Microsoft VS Code\\Code.exe",
+        "C:\\Program Files (x86)\\Microsoft VS Code\\Code.exe"
+    };
+    private static readonly string[] MACOSX_CODE_PATHS = {
+        "/Applications/Visual Studio Code.app"
+    };
+    private static readonly string[] LINUX_CODE_PATHS = {
+        "/snap/bin/code", "/usr/bin/code"
+    };
+
     public string GetDescription()
     {
         return "Open in VSCode";
@@ -12,40 +26,73 @@ public class VsCodeDetection : IIdeDetector
 
     public string GetCommand(IdeDetectorArguments args)
     {
-        return "code";
+        string command = GetExePathForPlatform();
+        if (OperatingSystem.IsMacOS() && !onPath)
+        {
+            return $"open -na \"{command}\"";
+        }
+        return $"\"{command}\"";
     }
 
     public string GetArguments(IdeDetectorArguments args)
     {
+        if (OperatingSystem.IsMacOS() && !onPath)
+        {
+            return $" --args \"{args.folderPath}\"";
+        }
         return $" \"{args.folderPath}\"";
     }
 
     public bool IsInstalled()
     {
-        if (CheckForVSCodeCommand())
+        return GetExePathForPlatform() != null;
+    }
+
+    private string? GetExePathForPlatform()
+    {
+        if (CheckForVSCodeCommandOnPath())
         {
-            return true;
+            return "code";
         }
         if (OperatingSystem.IsWindows())
         {
-
+            foreach (string temp in WINDOWS_CODE_PATHS)
+            {
+                if (File.Exists(temp))
+                {
+                    return temp;
+                }
+            }
         }
         else if (OperatingSystem.IsMacOS())
         {
-            return Directory.Exists("/Applications/Visual Studio Code.app");
+            foreach (string temp in MACOSX_CODE_PATHS)
+            {
+                if (Directory.Exists(temp))
+                {
+                    return temp;
+                }
+            }
         }
         else if (OperatingSystem.IsLinux())
         {
-
+            foreach (string temp in LINUX_CODE_PATHS)
+            {
+                if (File.Exists(temp))
+                {
+                    return temp;
+                }
+            }
         }
-        return false;
+        return null;
     }
 
-    private bool CheckForVSCodeCommand()
+    private bool CheckForVSCodeCommandOnPath()
     {
         string command = "code --version";
         ShellExecutor exe = ShellExecutor.getSingleInstance();
         ShellExecutorResult result = exe.ExecuteCommand(command, 2000);
-        return result.ExitCode == 0;
+        this.onPath = result.ExitCode == 0;
+        return this.onPath;
     }
 }
