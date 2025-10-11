@@ -105,7 +105,7 @@ public class VsCodeDetection : IIdeDetector
             ShellExecutor exe = ShellExecutor.getSingleInstance();
             ShellExecutorResult result = exe.ExecuteCommand(command, 2000);
             this.onPath = result.ExitCode == 0;
-            this.pathChecked = true;s
+            this.pathChecked = true;
         }
         return this.onPath;
     }
