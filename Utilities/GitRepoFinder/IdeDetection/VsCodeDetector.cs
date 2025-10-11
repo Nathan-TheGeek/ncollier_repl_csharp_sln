@@ -6,6 +6,7 @@ using GitRepoFinder.Plugin.Interface.IdeDetection;
 
 public class VsCodeDetection : IIdeDetector
 {
+    private bool pathChecked = false;
     private bool onPath;
     private static readonly string[] WINDOWS_CODE_PATHS = {
         "%AppData%\\..\\Local\\Programs\\Microsoft VS Code\\code.exe",
@@ -31,7 +32,12 @@ public class VsCodeDetection : IIdeDetector
         {
             return $"open -na \"{command}\"";
         }
-        return $"\"{command}\"";
+        else if (OperatingSystem.IsWindows())
+        {
+            command = command.Contains(" ") ? $"\"{command}\"" : command;
+            return $"{command} \"{args.folderPath}s\"";
+        }
+        return $"{command}";
     }
 
     public string GetArguments(IdeDetectorArguments args)
@@ -39,6 +45,10 @@ public class VsCodeDetection : IIdeDetector
         if (OperatingSystem.IsMacOS() && !onPath)
         {
             return $" --args \"{args.folderPath}\"";
+        }
+        else if (OperatingSystem.IsWindows())
+        {
+            return ""; // args pass in the command due to how cmd /C works.s
         }
         return $" \"{args.folderPath}\"";
     }
@@ -89,10 +99,14 @@ public class VsCodeDetection : IIdeDetector
 
     private bool CheckForVSCodeCommandOnPath()
     {
-        string command = "code --version";
-        ShellExecutor exe = ShellExecutor.getSingleInstance();
-        ShellExecutorResult result = exe.ExecuteCommand(command, 2000);
-        this.onPath = result.ExitCode == 0;
+        if (!pathChecked)
+        {
+            string command = "code --version";
+            ShellExecutor exe = ShellExecutor.getSingleInstance();
+            ShellExecutorResult result = exe.ExecuteCommand(command, 2000);
+            this.onPath = result.ExitCode == 0;
+            this.pathChecked = true;s
+        }
         return this.onPath;
     }
 }
