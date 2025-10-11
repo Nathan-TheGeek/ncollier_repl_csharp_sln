@@ -136,7 +136,7 @@ public static class MainWindowRepo
             var item = new nac.Forms.model.MenuItem();
             
             item.Header = c.Description;
-            item.Action = () =>
+            item.Action = async() =>
             {
                 runCommand(repo, command: c);
             };
@@ -146,7 +146,7 @@ public static class MainWindowRepo
         return items.ToArray();
     }
 
-    private static void runCommand(GitRepoInfo repo, FolderCommandModel command)
+    private async static void runCommand(GitRepoInfo repo, FolderCommandModel command)
     {
         try
         {
@@ -172,7 +172,7 @@ public static class MainWindowRepo
 
             repos.log.Info($"Running command: EXE[{cmdStr}] Arguments[{cmdArgs}]");
 
-            ShellExecutorResult result = shellExecutor.ExecuteCommand(cmdStr + " " + cmdArgs);
+            ShellExecutorResult result = await shellExecutor.ExecuteCommand(cmdStr + " " + cmdArgs);
 
             if (result.ExitCode > 0)
             {

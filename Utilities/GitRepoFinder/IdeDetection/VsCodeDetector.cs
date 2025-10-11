@@ -103,8 +103,12 @@ public class VsCodeDetection : IIdeDetector
         {
             string command = "code --version";
             ShellExecutor exe = ShellExecutor.getSingleInstance();
-            ShellExecutorResult result = exe.ExecuteCommand(command, 2000);
-            this.onPath = result.ExitCode == 0;
+            ShellExecutorResult result = null;
+            Task.WaitAll(new Task[]{ Task.Run(async () => {
+                    result = await exe.ExecuteCommand(command, 2000);
+                })
+            });
+            this.onPath = result?.ExitCode == 0;
             this.pathChecked = true;
         }
         return this.onPath;
